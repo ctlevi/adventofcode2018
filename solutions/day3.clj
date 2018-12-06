@@ -1,7 +1,7 @@
 ; (def input ["#1 @ 1,3: 4x4" "#2 @ 3,1: 4x4" "#3 @ 5,5: 2x2"])
 (def input
   (->>
-   (slurp "day3.txt")
+   (slurp "inputs/day3.txt")
    (clojure.string/split-lines)))
 
 (defn parseInputIntoClaims [rawClaims]

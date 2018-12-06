@@ -1,7 +1,7 @@
 ; (def inputNumbers [5 2 2 5 5 7])
 (def inputNumbers
   (->>
-   (slurp "day1-last-year.txt")
+   (slurp "inputs/day1-last-year.txt")
    (vec)
    (mapv str)
    (mapv #(Integer/parseInt %))))

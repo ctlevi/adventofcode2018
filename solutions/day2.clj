@@ -2,7 +2,7 @@
 ; (def input ["abcde" "fghij" "klmno" "pqrst" "fguij" "axcye" "wvxyz"])
 (def input
   (->>
-   (slurp "day2.txt")
+   (slurp "inputs/day2.txt")
    (clojure.string/split-lines)))
 
 (def answer1

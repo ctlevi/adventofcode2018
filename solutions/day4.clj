@@ -1,5 +1,5 @@
-; (def input (slurp "day4-test.txt"))
-(def input (slurp "day4.txt"))
+; (def input (slurp "inputs/day4-test.txt"))
+(def input (slurp "inputs/day4.txt"))
 
 ; Parses the input lines into a more friendly list of maps. Each line is parsed into:
 ;

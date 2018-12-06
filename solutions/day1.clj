@@ -1,7 +1,7 @@
 ; (def inputNumbers [7 7 -2 -7 -4])
 (def inputNumbers
   (->>
-   (slurp "day1.txt")
+   (slurp "inputs/day1.txt")
    (clojure.string/split-lines)
    (mapv #(Integer/parseInt %))))
 
