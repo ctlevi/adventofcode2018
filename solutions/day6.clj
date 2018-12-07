@@ -66,5 +66,3 @@
          (map (fn [[_ area]] area))
          (apply max))))
 (println answer1)
-; area-counts
-; (apply max (map (fn [[_ area]] area) (filter (fn [[k v]] (not (contains? infinite-coords k))) area-counts)))
