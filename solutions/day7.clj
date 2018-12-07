@@ -1,5 +1,5 @@
-(def input (slurp "inputs/day7-test.txt"))
-; (def input (slurp "inputs/day7.txt"))
+; (def input (slurp "inputs/day7-test.txt"))
+(def input (slurp "inputs/day7.txt"))
 
 ; Splits into a list of tuples like (A C) where A needs to finish before C
 (def input-instructions
@@ -8,10 +8,12 @@
        (map #(rest (re-find #"Step ([A-Z]) must be finished before step ([A-Z]) can begin." %)))))
 
 (def dependencies-map
-  (reduce
-   (fn [deps [before after]] (update deps before #(conj % after)))
-   {}
-   input-instructions))
+  (let [possible-steps (distinct (flatten input-instructions))
+        init-dependencies (reduce #(assoc %1 %2 '()) {} possible-steps)]
+    (reduce
+     (fn [deps [before after]] (update deps before #(conj % after)))
+     init-dependencies
+     input-instructions)))
 
 (defn find-next-step [dependencies]
   (let [remaining-steps (into #{} (keys dependencies))
