@@ -66,3 +66,23 @@
          (map (fn [[_ area]] area))
          (apply max))))
 (println answer1)
+
+; TODO these two methods are practically the same as above, could generalize them
+(defn sum-to-all-coordinates [x y coordinates]
+  (->> coordinates
+       (map (fn [[coord-x coord-y]] (distance x y coord-x coord-y)))
+       (reduce +)))
+
+(defn generate-grid-with-sum-distance [grid coordinates]
+  (map-indexed
+   (fn [y row] (map-indexed
+                (fn [x _] (sum-to-all-coordinates x y coordinates))
+                row))
+   grid))
+
+(def answer2
+  (->> (generate-grid-with-sum-distance base-grid input-coordinates)
+       (flatten)
+       (filter #(< % 10000))
+       (count)))
+(println answer2)
