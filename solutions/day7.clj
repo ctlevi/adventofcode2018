@@ -20,8 +20,6 @@
         steps-not-yet-ready (into #{} (flatten (vals dependencies)))]
     (first (apply sorted-set (clojure.set/difference remaining-steps steps-not-yet-ready)))))
 
-; This actually fails at giving the very last step, but I just manually added the single missing letter at the end
-; TODO I should fix that
 (def answer1
   (clojure.string/join
    ""
@@ -34,4 +32,41 @@
          step-order
          (recur new-dependencies step-order))))))
 
+(defn get-step-time [step]
+  (-> step
+      (.charAt 0)
+      (int)
+      (- 64)
+      (+ 60)))
+
+(defn find-next-steps [dependencies]
+  (let [remaining-steps (into #{} (keys dependencies))
+        steps-not-yet-ready (into #{} (flatten (vals dependencies)))]
+    (apply sorted-set (clojure.set/difference remaining-steps steps-not-yet-ready))))
+
+(def max-workers 5)
+; Worker looks like { :time-left 34,  :step "A" }, workers is a list of these
+(defn advance-time [dependencies workers]
+  (let [workers-after-next-second (map #(update % :time-left dec) workers)
+        steps-just-finished (map :step (filter (fn [worker] (= 0 (:time-left worker))) workers-after-next-second))
+        workers-still-working (filter (fn [worker] (> (:time-left worker) 0)) workers-after-next-second)
+        new-workers-to-add (- max-workers (count workers-still-working))
+        new-dependencies (reduce dissoc dependencies steps-just-finished)
+        steps-still-working (into #{} (map :step workers-still-working))
+        next-steps (clojure.set/difference (find-next-steps new-dependencies) steps-still-working)]
+    [new-dependencies, (->> next-steps
+                            (take new-workers-to-add)
+                            (map (fn [step] {:time-left (get-step-time step), :step step}))
+                            (concat workers-still-working))]))
+
+(def answer2
+  (loop [dependencies dependencies-map
+         workers '()
+         time 0]
+    (if (and (not= time 0) (empty? workers))
+      (- time 1)
+      (let [[next-dependencies next-workers] (advance-time dependencies workers)]
+        (recur next-dependencies next-workers (inc time))))))
+
 (println answer1)
+(println answer2)
