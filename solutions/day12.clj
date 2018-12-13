@@ -9,7 +9,7 @@
                  (let [[_ match outcome] (re-find #"(.*) => (.)" rule-string)]
                    {:match match, :outcome outcome}))
                (drop 2 lines))]
-    {:pots start-pots, :rules rules, :first 0}))
+    {:pots start-pots, :rules rules, :first 0, :generation 0}))
 
 (defn find-matching-rule [pots rules index]
   (let [start (max 0 (- index 2))
@@ -29,7 +29,8 @@
 (defn advance-one-generation [state]
   (let [{pots :pots,
          rules :rules,
-         first :first} state
+         first :first,
+         generation :generation} state
         extend-front (clojure.string/includes? (subs pots 0 2) "#")
         extend-back (clojure.string/includes? (subs pots (- (count pots) 2)) "#")
         pots-to-use (cond
@@ -38,6 +39,7 @@
                       extend-back (str pots "..")
                       :else pots)]
     {:first (if extend-front (- first 2) first),
+     :generation (inc generation)
      :rules rules
      :pots (clojure.string/join
             (map-indexed
@@ -56,7 +58,22 @@
       (fn [i pot] (if (= pot \#) (+ i first) 0))
       pots))))
 
-(score-state (reduce
-              (fn [state _] (advance-one-generation state))
-              (parse-state-and-rules raw-input)
-              (repeat 20 nil)))
+(println (score-state
+ (last
+  (take
+   21
+   (iterate advance-one-generation (parse-state-and-rules raw-input))))))
+
+; Helps you find when the pattern starts repeating
+; (map (fn [[x y]] (let [xscore (score-state x) yscore (score-state y)]
+;                    (do
+;                      (println [(:generation y) yscore (- yscore xscore)]))))
+;      (map vector
+;           (take
+;            200
+;            (iterate advance-one-generation (parse-state-and-rules raw-input)))
+;           (take
+;            200
+;            (rest (iterate advance-one-generation (parse-state-and-rules raw-input))))))
+
+(println (+ (* (- 50000000000 153) 53) 8575))
