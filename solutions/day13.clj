@@ -1,4 +1,5 @@
 ; (def raw-input (slurp "inputs/day13-test.txt"))
+; (def raw-input (slurp "inputs/day13-test-2.txt"))
 (def raw-input (slurp "inputs/day13.txt"))
 
 (defn parse-initial-state [input]
@@ -119,4 +120,39 @@
               (iterate run-tick-until-crash)
               (map #(find-crash (:carts %)))
               (filter #(not= nil %))
+              (first)))
+
+;; PART 2
+
+(defn remove-crashes [updated-carts old-carts]
+  (let [crash (find-crash (concat updated-carts old-carts))]
+    [(filter #(not= (:position %) crash) updated-carts)
+     (filter #(not= (:position %) crash) old-carts)]))
+
+(defn move-carts-remove-crashes [{carts :carts, tracks :tracks}]
+  (loop [new-carts '()
+         [cart & existing-carts] carts]
+    (if (nil? cart)
+      new-carts
+      (let [new-cart (next-cart tracks cart)
+            next-new-carts (conj new-carts new-cart)
+            [new-removed existing-removed] (remove-crashes next-new-carts existing-carts)]
+        (recur new-removed existing-removed)))))
+
+; Will try to run a full tick, but if a crash happens in the middle of
+; running the tick, it will remove the two crashed carts, and continue
+; with the remaining carts that need to be moved.
+(defn run-tick-remove-crashes [state]
+  (assoc state :carts
+         (let [{tracks :tracks, carts :carts} state]
+          ; Sort by y and then x position
+           (sort-by
+            (fn [{position :position}] [(position 1) (position 0)])
+            (move-carts-remove-crashes state)))))
+
+(println (->> raw-input
+              (parse-initial-state)
+              (iterate run-tick-remove-crashes)
+              (map :carts)
+              (filter #(= 1 (count %)))
               (first)))
